@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: Multibanco payment cancellation
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /payyourfines/{hash}/comprobar-cancelacion:
+    patch:
+      summary: Get dossiers that would be affected by the cancellation of a Multibanco
+        payment.
+      description: This endpoint is for information only. The dossiers to be cancelled
+        are received and those that would be affected are returned.
+      operationId: payyourfinesHashComprobar_cancelacionPATCH
+      parameters:
+      - name: hash
+        in: path
+        description: PayYourFines link hash
+        required: true
+        style: simple
+        explode: false
+        schema: {}
+        example: 3bbd9efcc31f9f0e3b5ae9e4e1a1f39cadf0dcef0c2045a06036a22710b2d191579bc5b33659c14b7724747ae899c1d1763f789d11ddcde1ded7cbc502181a81
+      requestBody:
+        description: Array of dossiers to consult
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hash_comprobarcancelacion_body'
+        required: true
+      responses:
+        "200":
+          description: Successful response with the dossiers that would be affected
+          content:
+            application/json:
+              example:
+              - "1928723"
+              - "1928723"
+              - "2324523"
+              - "34321223"
+        "400":
+          description: "Bad response. Reason: The array of dossiers has not been provided\
+            \ in the request."
+          content:
+            application/json:
+              example: "Error: No se ha recibido el listado de expedientes"
+        "500":
+          description: Bad response. Any other error.
+          content:
+            application/json:
+              example: ExceptionError
+      x-swagger-router-controller: Default
+  /payyourfines/{hash}/cancelar-pago:
+    post:
+      summary: Cancel Multibanco pending pay(s).
+      description: This request cancels one or more Multibanco pending payments.
+      operationId: payyourfinesHashCancelar_pagoPOST
+      parameters:
+      - name: hash
+        in: path
+        description: PayYourFines link hash
+        required: true
+        style: simple
+        explode: false
+        schema: {}
+        example: 3bbd9efcc31f9f0e3b5ae9e4e1a1f39cadf0dcef0c2045a06036a22710b2d191579bc5b33659c14b7724747ae899c1d1763f789d11ddcde1ded7cbc502181a81
+      requestBody:
+        description: Array of dossiers associated with the pending payment to be cancelled.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hash_cancelarpago_body'
+        required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example: Pago cancelado correctamente
+        "400":
+          description: Bad response
+          content:
+            application/json:
+              examples:
+                Error on the Stripe API call:
+                  value: Error en la llamada a la API de Stripe
+                The array of dossiers has not been provided in the request:
+                  value: "Error: No se ha recibido el listado de expedientes"
+        "500":
+          description: Bad reponse. Any other error.
+          content:
+            application/json:
+              example: ExceptionError
+      x-swagger-router-controller: Default
+components:
+  schemas:
+    hash_comprobarcancelacion_body:
+      properties:
+        expedientes:
+          items: {}
+    hash_cancelarpago_body:
+      properties:
+        expedientes:
+          items: {}
